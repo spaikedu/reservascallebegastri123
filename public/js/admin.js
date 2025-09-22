@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     // !!! IMPORTANTE !!!
     // Pega aquí la misma URL de la Web App de Google Apps Script.
-    const googleAppScriptUrl = 'URL_DE_TU_GOOGLE_APPS_SCRIPT_AQUI';
+    const googleAppScriptUrl = 'https://script.google.com/macros/s/AKfycbzciNn8bcGhLGXGOrlGMPxsiJBcmDBKyJkTuiejpo7CkE9jTnbyrGmQn8OC1jIesXj6Xw/exec';
 
     const addHorarioForm = document.getElementById('add-horario-form');
     const mensajeDiv = document.getElementById('admin-mensaje');
