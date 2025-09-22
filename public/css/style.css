@@ -1,9 +1,35 @@
-/* Estilos personalizados */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
 body {
-    font-family: sans-serif;
+    font-family: 'Poppins', sans-serif;
+    background-color: #f8f9fa;
 }
 
-.btn-slot {
-    min-width: 150px;
-    font-size: 1.2rem;
+.container {
+    max-width: 600px;
+}
+
+h1 {
+    color: #343a40;
+    font-weight: 600;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+#mensaje.success {
+    color: green;
+    font-weight: bold;
+}
+
+#mensaje.error {
+    color: red;
+    font-weight: bold;
 }
