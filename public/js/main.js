@@ -1,10 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
     // !!! IMPORTANTE !!!
     // Pega aquí la misma URL de la Web App de Google Apps Script.
-    const googleAppScriptUrl = 'https://script.google.com/macros/s/AKfycbzciNn8bcGhLGXGOrlGMPxsiJBcmDBKyJkTuiejpo7CkE9jTnbyrGmQn8OC1jIesXj6Xw/exec';
+    const googleAppScriptUrl = 'URL_DE_TU_GOOGLE_APPS_SCRIPT_AQUI';
 
     const horariosContainer = document.getElementById('horarios-container');
     const fechaHoyEl = document.getElementById('fecha-hoy');
+    const notaHoyEl = document.getElementById('nota-hoy');
     const reservaModalEl = document.getElementById('reservaModal');
     const reservaForm = document.getElementById('reserva-form');
     const modalMensajeDiv = document.getElementById('modal-mensaje');
@@ -22,9 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(res => {
                 if (res.status === 'success') {
                     renderHorarios(res.data);
-                } else {
-                    throw new Error(res.message);
-                }
+                } else { throw new Error(res.message); }
             })
             .catch(error => {
                 console.error('Error al cargar horarios:', error);
@@ -34,6 +33,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- RENDERIZAR LOS BLOQUES DE HORARIOS ---
     function renderHorarios(horarios) {
+        const notaDelDia = horarios.find(h => h.Nota)?.Nota;
+        if (notaDelDia) {
+            notaHoyEl.textContent = notaDelDia;
+        }
+
         if (horarios.length === 0) {
             horariosContainer.innerHTML = '<p>No hay visitas programadas para hoy. ¡Vuelve a consultar más tarde!</p>';
             return;
@@ -46,9 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.textContent = horario.Hora;
             
             if (horario.Estado === 'Libre') {
-                btn.className = 'btn btn-horario btn-success';
-                btn.dataset.bsToggle = 'modal';
-                btn.dataset.bsTarget = '#reservaModal';
+                btn.className = 'btn btn-horario btn-success horario-libre'; // Añadida clase horario-libre
                 btn.dataset.id = horario.ID;
                 btn.dataset.hora = horario.Hora;
             } else {
@@ -59,21 +61,24 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- LÓGICA DEL MODAL DE RESERVA ---
-    reservaModalEl.addEventListener('show.bs.modal', (event) => {
-        // Botón que activó el modal
-        const button = event.relatedTarget;
-        const id = button.dataset.id;
-        const hora = button.dataset.hora;
+    // --- LÓGICA DE ALERTA Y APERTURA DE MODAL ---
+    horariosContainer.addEventListener('click', (event) => {
+        const target = event.target;
+        if (!target.classList.contains('horario-libre')) return;
 
-        // Actualizar contenido del modal
+        alert('Recuerda que vas a visitar a una recién nacida que no tiene defensas, ven con la mascarilla puesta. Gracias!');
+
+        const id = target.dataset.id;
+        const hora = target.dataset.hora;
+
         document.getElementById('hora-seleccionada').textContent = hora;
         document.getElementById('reserva-id').value = id;
         
-        // Limpiar formulario y mensajes
         reservaForm.reset();
         modalMensajeDiv.textContent = '';
         modalMensajeDiv.className = '';
+
+        reservaModal.show();
     });
 
     // --- ENVÍO DEL FORMULARIO DE RESERVA ---
@@ -92,11 +97,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     modalMensajeDiv.className = 'text-success';
                     setTimeout(() => {
                         reservaModal.hide();
-                        loadHorarios(); // Recargar para mostrar el horario como no disponible
+                        loadHorarios();
                     }, 2000);
-                } else {
-                    throw new Error(res.message);
-                }
+                } else { throw new Error(res.message); }
             })
             .catch(error => {
                 console.error('Error al solicitar reserva:', error);

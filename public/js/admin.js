@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     // !!! IMPORTANTE !!!
-    // Pega aquí la misma URL de la Web App de Google Apps Script que usaste en main.js.
-    const googleAppScriptUrl = 'https://script.google.com/macros/s/AKfycbzciNn8bcGhLGXGOrlGMPxsiJBcmDBKyJkTuiejpo7CkE9jTnbyrGmQn8OC1jIesXj6Xw/exec';
+    // Pega aquí la misma URL de la Web App de Google Apps Script.
+    const googleAppScriptUrl = 'URL_DE_TU_GOOGLE_APPS_SCRIPT_AQUI';
 
     const addHorarioForm = document.getElementById('add-horario-form');
     const mensajeDiv = document.getElementById('admin-mensaje');
@@ -32,7 +32,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Agrupar por fecha
         const groupedByDate = reservas.reduce((acc, reserva) => {
             const fecha = new Date(reserva.Fecha).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
             if (!acc[fecha]) {
@@ -45,6 +44,11 @@ document.addEventListener('DOMContentLoaded', () => {
         let html = '';
         for (const fecha in groupedByDate) {
             html += `<h4>${fecha}</h4>`;
+            const notaDelDia = groupedByDate[fecha].find(r => r.Nota)?.Nota;
+            if (notaDelDia) {
+                html += `<p class="text-muted fst-italic">Nota del día: ${notaDelDia}</p>`;
+            }
+
             html += '<ul class="list-group mb-4">';
             groupedByDate[fecha].sort((a, b) => a.Hora.localeCompare(b.Hora)).forEach(reserva => {
                 let content = '';
@@ -66,16 +70,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 html += `<li class="list-group-item d-flex justify-content-between align-items-center">
-                            <div>${badge} ${content}</div>`;
+                            <div>${badge} ${content}</div>
+                            <div>`;
 
                 if (reserva.Estado === 'Pendiente') {
-                    html += `<div>
-                                <button class="btn btn-sm btn-success me-2" data-id="${reserva.ID}" data-action="confirmar">Aceptar</button>
-                                <button class="btn btn-sm btn-danger" data-id="${reserva.ID}" data-action="rechazar">Rechazar</button>
-                             </div>`;
+                    html += `<button class="btn btn-sm btn-success me-2" data-id="${reserva.ID}" data-action="confirmar">Aceptar</button>
+                             <button class="btn btn-sm btn-warning" data-id="${reserva.ID}" data-action="rechazar">Rechazar</button>`;
                 }
                 
-                html += `</li>`;
+                html += `<button class="btn btn-sm btn-danger ms-2" data-id="${reserva.ID}" data-action="eliminar">Eliminar</button>
+                         </div>
+                      </li>`;
             });
             html += '</ul>';
         }
@@ -89,11 +94,13 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const fecha = document.getElementById('admin-fecha').value;
         const hora = document.getElementById('admin-hora').value;
+        const nota = document.getElementById('admin-nota').value;
 
         const formData = new FormData();
         formData.append('action', 'addHorario');
         formData.append('fecha', fecha);
         formData.append('hora', hora);
+        formData.append('nota', nota);
 
         fetch(googleAppScriptUrl, { method: 'POST', body: formData })
             .then(response => response.json())
@@ -102,10 +109,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     mensajeDiv.textContent = '¡Horario añadido con éxito!';
                     mensajeDiv.className = 'text-success';
                     addHorarioForm.reset();
-                    loadAdminData(); // Recargar la lista
-                } else {
-                    throw new Error(data.message);
-                }
+                    loadAdminData();
+                } else { throw new Error(data.message); }
             })
             .catch(error => {
                 console.error('Error al añadir horario:', error);
@@ -114,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     });
 
-    // --- GESTIONAR ACEPTAR/RECHAZAR ---
+    // --- GESTIONAR BOTONES DE ACCIÓN (ACEPTAR, RECHAZAR, ELIMINAR) ---
     reservasListDiv.addEventListener('click', e => {
         const target = e.target;
         const id = target.dataset.id;
@@ -122,27 +127,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!id || !action) return;
 
-        const nuevoEstado = action === 'confirmar' ? 'Confirmado' : 'Libre';
-        
+        let promise;
         const formData = new FormData();
-        formData.append('action', 'updateEstado');
         formData.append('id', id);
-        formData.append('nuevoEstado', nuevoEstado);
 
-        fetch(googleAppScriptUrl, { method: 'POST', body: formData })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    alert(`Reserva ${action === 'confirmar' ? 'confirmada' : 'rechazada'}.`);
-                    loadAdminData(); // Recargar la lista
-                } else {
-                    throw new Error(data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error al actualizar estado:', error);
-                alert(`Error: ${error.message}`);
-            });
+        if (action === 'confirmar' || action === 'rechazar') {
+            const nuevoEstado = action === 'confirmar' ? 'Confirmado' : 'Libre';
+            formData.append('action', 'updateEstado');
+            formData.append('nuevoEstado', nuevoEstado);
+            promise = fetch(googleAppScriptUrl, { method: 'POST', body: formData });
+        } else if (action === 'eliminar') {
+            if (!confirm('¿Estás seguro de que quieres eliminar este horario? Esta acción no se puede deshacer.')) {
+                return;
+            }
+            formData.append('action', 'deleteHorario');
+            promise = fetch(googleAppScriptUrl, { method: 'POST', body: formData });
+        }
+
+        if (promise) {
+            promise.then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert(data.message);
+                        loadAdminData();
+                    } else { throw new Error(data.message); }
+                })
+                .catch(error => {
+                    console.error('Error en la acción:', error);
+                    alert(`Error: ${error.message}`);
+                });
+        }
     });
 
     // Carga inicial

@@ -17,18 +17,22 @@
                 Añadir Nuevo Horario de Visita
             </div>
             <div class="card-body">
-                <form id="add-horario-form" class="row g-3 align-items-end">
-                    <div class="col-md-5">
-                        <label for="admin-fecha" class="form-label">Fecha</label>
-                        <input type="date" class="form-control" id="admin-fecha" required>
+                <form id="add-horario-form">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label for="admin-fecha" class="form-label">Fecha</label>
+                            <input type="date" class="form-control" id="admin-fecha" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="admin-hora" class="form-label">Hora</label>
+                            <input type="time" class="form-control" id="admin-hora" required>
+                        </div>
+                        <div class="col-md-5">
+                            <label for="admin-nota" class="form-label">Nota para este día (opcional)</label>
+                            <input type="text" class="form-control" id="admin-nota" placeholder="Ej: Solo visitas cortas">
+                        </div>
                     </div>
-                    <div class="col-md-5">
-                        <label for="admin-hora" class="form-label">Hora (ej. 17:00)</label>
-                        <input type="time" class="form-control" id="admin-hora" required>
-                    </div>
-                    <div class="col-md-2">
-                        <button type="submit" class="btn btn-primary w-100">Añadir</button>
-                    </div>
+                    <button type="submit" class="btn btn-primary mt-3">Añadir Horario</button>
                 </form>
                 <div id="admin-mensaje" class="mt-3"></div>
             </div>
@@ -40,7 +44,6 @@
                 Gestión de Reservas
             </div>
             <div class="card-body">
-                <p>Aquí se mostrarán todas las reservas (pendientes y confirmadas).</p>
                 <div id="reservas-lista">
                     <!-- Las reservas se cargarán aquí dinámicamente -->
                 </div>
