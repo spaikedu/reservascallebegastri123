@@ -1,35 +1,94 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Pacifico&display=swap');
+
+/* Paleta de colores */
+:root {
+    --bg-color: #FFF8F9; /* Beige rosado muy claro */
+    --card-bg-color: #FFFFFF;
+    --primary-pink: #E8A0BF;
+    --dark-text: #5D5D5D;
+    --green-available: #A8D8B9;
+    --gray-unavailable: #E0E0E0;
+}
 
 body {
     font-family: 'Poppins', sans-serif;
-    background-color: #f8f9fa;
+    background-color: var(--bg-color);
+    color: var(--dark-text);
+}
+
+h1, h2, h3, h4, h5 {
+    font-family: 'Pacifico', cursive;
+    color: var(--primary-pink);
 }
 
 .container {
-    max-width: 600px;
+    max-width: 720px;
 }
 
-h1 {
-    color: #343a40;
+/* Estilos para los botones de horarios */
+#horarios-container {
+    min-height: 100px; /* Para que el mensaje de "cargando" se vea bien */
+}
+
+.btn-horario {
+    font-size: 1.2rem;
+    font-weight: 600;
+    padding: 10px 25px;
+    border-radius: 10px;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.btn-horario.btn-success {
+    background-color: var(--green-available);
+    border-color: var(--green-available);
+    color: #fff;
+}
+
+.btn-horario.btn-success:hover {
+    background-color: #82c998;
+    border-color: #82c998;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.btn-horario.btn-secondary {
+    background-color: var(--gray-unavailable);
+    border-color: var(--gray-unavailable);
+    color: #888;
+    cursor: not-allowed;
+}
+
+/* Estilos para el panel de admin */
+.card {
+    background-color: var(--card-bg-color);
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.badge.bg-warning {
+    background-color: #FFDDA1 !important;
+    color: #5D5D5D !important;
+}
+
+.badge.bg-success {
+    background-color: var(--green-available) !important;
+}
+
+.badge.bg-secondary {
+    background-color: var(--gray-unavailable) !important;
+    color: #5D5D5D !important;
+}
+
+/* Botones primarios */
+.btn-primary {
+    background-color: var(--primary-pink);
+    border-color: var(--primary-pink);
     font-weight: 600;
 }
 
-.btn-primary {
-    background-color: #007bff;
-    border-color: #007bff;
-}
-
 .btn-primary:hover {
-    background-color: #0056b3;
-    border-color: #0056b3;
-}
-
-#mensaje.success {
-    color: green;
-    font-weight: bold;
-}
-
-#mensaje.error {
-    color: red;
-    font-weight: bold;
+    background-color: #d183a8;
+    border-color: #d183a8;
 }
