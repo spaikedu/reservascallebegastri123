@@ -44,11 +44,6 @@ document.addEventListener('DOMContentLoaded', () => {
         let html = '';
         for (const fecha in groupedByDate) {
             html += `<h4>${fecha}</h4>`;
-            const notaDelDia = groupedByDate[fecha].find(r => r.Nota)?.Nota;
-            if (notaDelDia) {
-                html += `<p class="text-muted fst-italic">Nota del día: ${notaDelDia}</p>`;
-            }
-
             html += '<ul class="list-group mb-4">';
             groupedByDate[fecha].sort((a, b) => a.Hora.localeCompare(b.Hora)).forEach(reserva => {
                 let content = '';
@@ -57,7 +52,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 switch (reserva.Estado) {
                     case 'Libre':
                         badge = '<span class="badge bg-success">Libre</span>';
-                        content = `Añadido a las ${reserva.Hora}.`;
+                        content = `Añadido a las ${reserva.Hora}`;
+                        if (reserva.Nota) {
+                            content += `<br><small class="text-muted fst-italic">Nota: ${reserva.Nota}</small>`;
+                        }
+                        content += '.';
                         break;
                     case 'Pendiente':
                         badge = '<span class="badge bg-warning">Pendiente</span>';
